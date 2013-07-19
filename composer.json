@@ -1,0 +1,25 @@
+{
+    "name": "dflydev/stack-hawk",
+    "autoload": {
+        "psr-0": {
+            "Dflydev\\Stack": "src"
+        }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/dflydev/dflydev-hawk"
+        }
+    ],
+    "require": {
+        "dflydev/hawk": "1.0.*@dev",
+        "symfony/http-foundation": "~2.1",
+        "symfony/http-kernel": "~2.1",
+
+        "ircmaxell/random-lib": "@dev",
+        "ircmaxell/security-lib": "@dev"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.21"
+    }
+}
