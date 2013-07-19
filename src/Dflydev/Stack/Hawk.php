@@ -122,6 +122,18 @@ class Hawk implements HttpKernelInterface
             return $builder->build();
         });
 
+        foreach ($options as $name => $value) {
+            if (in_array($name, ['crypto', 'server'])) {
+                if (is_callable($value)) {
+                    $c[$name] = $c->share($value);
+                } else {
+                    $c[$name] = $value;
+                }
+            } else {
+                $c[$name] = $value;
+            }
+        }
+
         return $c;
     }
 }
