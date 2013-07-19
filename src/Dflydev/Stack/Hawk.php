@@ -35,7 +35,6 @@ class Hawk implements HttpKernelInterface
             // We are only interested in requests with a HAWK authorization header.
             return call_user_func($delegate);
         } catch (FieldValueParserException $e) {
-            // If
             return (new Response)->setCode(400);
         }
 
