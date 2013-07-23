@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "51a4385980208ad339bceca7ecfc91c3",
+    "hash": "684c8ba7d9f404a8fd156057c6894fe0",
     "packages": [
         {
             "name": "dflydev/hawk",
@@ -11,12 +11,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dflydev/dflydev-hawk.git",
-                "reference": "e7f38bab706bb7ae7b3a30196ced2bb4ec31a6eb"
+                "reference": "d3ffe6dd6f86b52e9c0b5317f653e9f2d51427ae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dflydev/dflydev-hawk/zipball/e7f38bab706bb7ae7b3a30196ced2bb4ec31a6eb",
-                "reference": "e7f38bab706bb7ae7b3a30196ced2bb4ec31a6eb",
+                "url": "https://api.github.com/repos/dflydev/dflydev-hawk/zipball/d3ffe6dd6f86b52e9c0b5317f653e9f2d51427ae",
+                "reference": "d3ffe6dd6f86b52e9c0b5317f653e9f2d51427ae",
                 "shasum": ""
             },
             "require": {
@@ -41,7 +41,7 @@
                 "source": "https://github.com/dflydev/dflydev-hawk/tree/master",
                 "issues": "https://github.com/dflydev/dflydev-hawk/issues"
             },
-            "time": "2013-07-19 16:26:30"
+            "time": "2013-07-23 03:26:43"
         },
         {
             "name": "ircmaxell/random-lib",
@@ -765,6 +765,398 @@
             "time": "2013-01-13 10:24:48"
         },
         {
+            "name": "pimple/pimple",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fabpot/Pimple.git",
+                "reference": "v1.0.2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fabpot/Pimple/zipball/v1.0.2",
+                "reference": "v1.0.2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Pimple": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "Pimple is a simple Dependency Injection Container for PHP 5.3",
+            "homepage": "http://pimple.sensiolabs.org",
+            "keywords": [
+                "container",
+                "dependency injection"
+            ],
+            "time": "2013-03-08 08:21:40"
+        },
+        {
+            "name": "silex/silex",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fabpot/Silex.git",
+                "reference": "4945dd0f7d6ad3e696b09bf980b7b1306e5fd1c8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fabpot/Silex/zipball/4945dd0f7d6ad3e696b09bf980b7b1306e5fd1c8",
+                "reference": "4945dd0f7d6ad3e696b09bf980b7b1306e5fd1c8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3",
+                "pimple/pimple": "1.*",
+                "symfony/event-dispatcher": ">=2.3,<2.4-dev",
+                "symfony/http-foundation": ">=2.3,<2.4-dev",
+                "symfony/http-kernel": ">=2.3,<2.4-dev",
+                "symfony/routing": ">=2.3,<2.4-dev"
+            },
+            "require-dev": {
+                "doctrine/dbal": ">=2.2.0,<2.4.0-dev",
+                "monolog/monolog": "~1.4,>=1.4.1",
+                "phpunit/phpunit": "~3.7",
+                "swiftmailer/swiftmailer": "5.*",
+                "symfony/browser-kit": ">=2.3,<2.4-dev",
+                "symfony/config": ">=2.3,<2.4-dev",
+                "symfony/css-selector": ">=2.3,<2.4-dev",
+                "symfony/dom-crawler": ">=2.3,<2.4-dev",
+                "symfony/finder": ">=2.3,<2.4-dev",
+                "symfony/form": ">=2.3,<2.4-dev",
+                "symfony/locale": ">=2.3,<2.4-dev",
+                "symfony/monolog-bridge": ">=2.3,<2.4-dev",
+                "symfony/options-resolver": ">=2.3,<2.4-dev",
+                "symfony/process": ">=2.3,<2.4-dev",
+                "symfony/security": ">=2.3,<2.4-dev",
+                "symfony/serializer": ">=2.3,<2.4-dev",
+                "symfony/translation": ">=2.3,<2.4-dev",
+                "symfony/twig-bridge": ">=2.3,<2.4-dev",
+                "symfony/validator": ">=2.3,<2.4-dev",
+                "twig/twig": ">=1.8.0,<2.0-dev"
+            },
+            "suggest": {
+                "symfony/browser-kit": ">=2.3,<2.4-dev",
+                "symfony/css-selector": ">=2.3,<2.4-dev",
+                "symfony/dom-crawler": ">=2.3,<2.4-dev",
+                "symfony/form": ">=2.3,<2.4-dev"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Silex": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Igor Wiedler",
+                    "email": "igor@wiedler.ch",
+                    "homepage": "http://wiedler.ch/igor/"
+                }
+            ],
+            "description": "The PHP micro-framework based on the Symfony2 Components",
+            "homepage": "http://silex.sensiolabs.org",
+            "keywords": [
+                "microframework"
+            ],
+            "time": "2013-07-19 10:22:31"
+        },
+        {
+            "name": "stack/builder",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stackphp/builder.git",
+                "reference": "d438b2aeb1f3dfa2c16497c68b7016ab7998748d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stackphp/builder/zipball/d438b2aeb1f3dfa2c16497c68b7016ab7998748d",
+                "reference": "d438b2aeb1f3dfa2c16497c68b7016ab7998748d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "symfony/http-foundation": "~2.1",
+                "symfony/http-kernel": "~2.1"
+            },
+            "require-dev": {
+                "silex/silex": "1.0.*@dev"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Stack": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Igor Wiedler",
+                    "email": "igor@wiedler.ch",
+                    "homepage": "http://wiedler.ch/igor/"
+                }
+            ],
+            "description": "Builder for stack middlewares based on HttpKernelInterface.",
+            "keywords": [
+                "stack"
+            ],
+            "time": "2013-04-29 12:20:08"
+        },
+        {
+            "name": "stack/callable-http-kernel",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stackphp/CallableHttpKernel.git",
+                "reference": "2cea2eab2c3a618bd378f1a2fa05917cf934b518"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stackphp/CallableHttpKernel/zipball/2cea2eab2c3a618bd378f1a2fa05917cf934b518",
+                "reference": "2cea2eab2c3a618bd378f1a2fa05917cf934b518",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "symfony/http-foundation": "~2.1",
+                "symfony/http-kernel": "~2.1"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Stack": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Igor Wiedler",
+                    "email": "igor@wiedler.ch",
+                    "homepage": "http://wiedler.ch/igor/"
+                }
+            ],
+            "description": "HttpKernelInterface implementation based on callables.",
+            "keywords": [
+                "stack"
+            ],
+            "time": "2013-05-17 16:07:54"
+        },
+        {
+            "name": "symfony/browser-kit",
+            "version": "v2.3.2",
+            "target-dir": "Symfony/Component/BrowserKit",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/BrowserKit.git",
+                "reference": "v2.3.2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/BrowserKit/zipball/v2.3.2",
+                "reference": "v2.3.2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3",
+                "symfony/dom-crawler": "~2.0"
+            },
+            "require-dev": {
+                "symfony/css-selector": "~2.0",
+                "symfony/process": "~2.0"
+            },
+            "suggest": {
+                "symfony/process": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\BrowserKit\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony BrowserKit Component",
+            "homepage": "http://symfony.com",
+            "time": "2013-07-07 15:48:29"
+        },
+        {
+            "name": "symfony/dom-crawler",
+            "version": "v2.3.2",
+            "target-dir": "Symfony/Component/DomCrawler",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/DomCrawler.git",
+                "reference": "v2.3.2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/DomCrawler/zipball/v2.3.2",
+                "reference": "v2.3.2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "symfony/css-selector": "~2.0"
+            },
+            "suggest": {
+                "symfony/css-selector": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\DomCrawler\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony DomCrawler Component",
+            "homepage": "http://symfony.com",
+            "time": "2013-07-01 12:24:43"
+        },
+        {
+            "name": "symfony/routing",
+            "version": "v2.3.2",
+            "target-dir": "Symfony/Component/Routing",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/Routing.git",
+                "reference": "v2.3.2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/Routing/zipball/v2.3.2",
+                "reference": "v2.3.2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "doctrine/common": "~2.2",
+                "psr/log": "~1.0",
+                "symfony/config": "~2.2",
+                "symfony/yaml": "~2.0"
+            },
+            "suggest": {
+                "doctrine/common": "",
+                "symfony/config": "",
+                "symfony/yaml": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\Routing\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Routing Component",
+            "homepage": "http://symfony.com",
+            "time": "2013-06-23 08:16:02"
+        },
+        {
             "name": "symfony/yaml",
             "version": "v2.3.2",
             "target-dir": "Symfony/Component/Yaml",
@@ -819,11 +1211,14 @@
     "stability-flags": {
         "dflydev/hawk": 20,
         "ircmaxell/random-lib": 20,
-        "ircmaxell/security-lib": 20
+        "ircmaxell/security-lib": 20,
+        "silex/silex": 20,
+        "stack/builder": 20,
+        "stack/callable-http-kernel": 20
     },
-    "platform": [
-
-    ],
+    "platform": {
+        "php": ">=5.4.0"
+    },
     "platform-dev": [
 
     ]

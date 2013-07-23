@@ -8,6 +8,7 @@ use Dflydev\Hawk\Server\ServerBuilder;
 use Dflydev\Hawk\Server\UnauthorizedException;
 use Pimple;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class Hawk implements HttpKernelInterface
@@ -21,7 +22,13 @@ class Hawk implements HttpKernelInterface
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         $delegate = function () use ($request, $type, $catch) {
-            return $this->app->handle($request, $type, $catch);
+            $response = $this->app->handle($request, $type, $catch);
+
+            if ($response->getStatusCode()==401 && !$request->headers->has('WWW-Authenticate')) {
+                $response->headers->set('WWW-Authenticate', 'Hawk');
+            }
+
+            return $response;
         };
 
         if (!$request->headers->has('authorization')) {
@@ -30,12 +37,12 @@ class Hawk implements HttpKernelInterface
         }
 
         try {
-            $header = HeaderFactory::createFromString($request->headers->get('authorization'));
+            $header = HeaderFactory::createFromString('Authorization', $request->headers->get('authorization'));
         } catch (NotHawkAuthorizationException $e) {
             // We are only interested in requests with a HAWK authorization header.
             return call_user_func($delegate);
         } catch (FieldValueParserException $e) {
-            return (new Response)->setCode(400);
+            return (new Response)->setStatusCode(400);
         }
 
         try {
@@ -43,17 +50,17 @@ class Hawk implements HttpKernelInterface
                 $qs = '?'.$qs;
             }
 
-            $authenticationResponse = $server->authenticate(
+            $authenticationResponse = $this->container['server']->authenticate(
                 $request->getMethod(),
                 $request->getHost(),
                 $request->getPort(),
                 $request->getBaseUrl().$request->getPathInfo().$qs,
                 $request->getContentType(),
-                $request->getContent(),
+                $request->getContent() ?: null,
                 $header
             );
         } catch (UnauthorizedException $e) {
-            $response = (new Response)->setCode(401);
+            $response = (new Response)->setStatusCode(401);
 
             $header = $e->getHeader();
             $response->headers->set($header->fieldName(), $header->fieldValue());
@@ -62,7 +69,7 @@ class Hawk implements HttpKernelInterface
         }
 
         // Compatiblity with standard Stack authorization
-        $request->attributes->set('token', $authenticationResponse->credentials()->id());
+        $request->attributes->set('stack.authentication.token', $authenticationResponse->credentials()->id());
 
         // Hawk specific information
         $request->attributes->set('hawk.credentials', $authenticationResponse->credentials());
@@ -71,7 +78,7 @@ class Hawk implements HttpKernelInterface
         $response = call_user_func($delegate);
 
         if ($this->container['sign_response']) {
-            $header = $c['server']->createHeader(
+            $header = $this->container['server']->createHeader(
                 $authenticationResponse->credentials(),
                 $authenticationResponse->artifacts(),
                 array(
@@ -88,43 +95,49 @@ class Hawk implements HttpKernelInterface
 
     private function setupContainer(array $options = array())
     {
-        if (!isset($options['user_provider'])) {
-            throw new \RuntimeException("No 'user_provider' callback or service specified");
+        if (!isset($options['credentials_provider'])) {
+            throw new \RuntimeException("No 'credentials_provider' callback or service specified");
         }
 
-        if ($options['user_provider'] instanceof UserProviderInterface) {
-            $c['user_provider'] = $options['user_provider'];
-        } elseif (is_callable($options['user_provider'])) {
-            $c['user_provider'] = $c->protect($c['user_provider']);
+        if ($options['credentials_provider'] instanceof UserProviderInterface ||
+            is_callable($options['credentials_provider'])) {
+            $credentialsProvider = $options['credentials_provider'];
         } else {
             throw new \InvalidArgumentException(
-                "The 'user_provider' must either be an instance of UserProviderInterface or it must be callable"
+                "The 'credentials_provider' must either be an instance of UserProviderInterface or it must be callable"
             );
         }
 
-        unset($options['user_provider']);
+        unset($options['credentials_provider']);
 
         $c = new Pimple([
             'sign_response' => true,
         ]);
 
         $c['crypto'] = $c->share(function () {
-            new Crypto;
+            return new Crypto;
         });
 
-        $c['server'] = $c->share(function () use ($c) {
-            $builder = (new ServerBuilder($c['user_provider']))
+        $c['server'] = $c->share(function () use ($c, $credentialsProvider) {
+            $builder = (new ServerBuilder($credentialsProvider))
                 ->setCrypto($c['crypto']);
 
-            // TODO: We should do things here with other builder related options
-            //       so that middleware users can customize how Hawk server works.
+            if (isset($c['time_provider'])) {
+                $builder->setTimeProvider($c['time_provider']);
+            }
 
             return $builder->build();
         });
 
         foreach ($options as $name => $value) {
-            if (in_array($name, ['crypto', 'server']) && is_callable($value)) {
-                $c[$name] = $c->share($value);
+            if (in_array($name, ['crypto', 'server', 'time_provider'])) {
+                if (is_callable($value)) {
+                    $c[$name] = $c->share($value);
+                } else {
+                    $c[$name] = $c->share(function () use ($value) {
+                        return $value;
+                    });
+                }
 
                 continue;
             }
