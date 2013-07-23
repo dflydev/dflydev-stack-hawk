@@ -46,15 +46,11 @@ class Hawk implements HttpKernelInterface
         }
 
         try {
-            if (null !== $qs = $request->getQueryString()) {
-                $qs = '?'.$qs;
-            }
-
             $authenticationResponse = $this->container['server']->authenticate(
                 $request->getMethod(),
                 $request->getHost(),
                 $request->getPort(),
-                $request->getBaseUrl().$request->getPathInfo().$qs,
+                $request->getRequestUri(),
                 $request->getContentType(),
                 $request->getContent() ?: null,
                 $header
