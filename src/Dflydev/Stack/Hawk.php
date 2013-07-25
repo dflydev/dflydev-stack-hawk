@@ -22,18 +22,9 @@ class Hawk implements HttpKernelInterface
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         $delegate = function () use ($request, $type, $catch) {
-            // Use Stack Security helper function to more easily follow
-            // the convention of challenge on 401 with WWW-Authenticate: Stack
-            // responses that come from the delegated app. Completely optional
-            // as long as the authentication middleware does this itself in
-            // order to follow the Stack authn/authz conventions.
             return \Stack\Security\delegate_authorization(
                 $this->app,
                 function (Response $response) {
-
-                    // We could in theory completely change the Response object
-                    // to something new or add additional headers.
-
                     $response->headers->set('WWW-Authenticate', 'Hawk');
 
                     return $response;
