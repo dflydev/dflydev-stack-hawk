@@ -9,11 +9,16 @@
         {
             "type": "vcs",
             "url": "https://github.com/dflydev/dflydev-hawk"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/simensen/stack-security"
         }
     ],
     "require": {
         "php": ">=5.4.0",
         "dflydev/hawk": "1.0.*@dev",
+        "stack/security": "1.0.*@dev",
         "symfony/http-foundation": "~2.1",
         "symfony/http-kernel": "~2.1",
 

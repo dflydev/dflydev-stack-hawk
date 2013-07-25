@@ -16,7 +16,9 @@ class SilexApplicationTest extends TestCase
     /** @test */
     public function shouldNotChallengeForUnprotectedResourceNoHeader()
     {
-        $app = $this->hawkify($this->createTestApp());
+        $app = $this->hawkify($this->createTestApp(), ['firewalls' => [
+            ['path' => '/', 'anonymous' => true],
+        ]]);
 
         $client = new Client($app);
 

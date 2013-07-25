@@ -22,18 +22,46 @@ class Hawk implements HttpKernelInterface
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         $delegate = function () use ($request, $type, $catch) {
-            $response = $this->app->handle($request, $type, $catch);
+            // Use Stack Security helper function to more easily follow
+            // the convention of challenge on 401 with WWW-Authenticate: Stack
+            // responses that come from the delegated app. Completely optional
+            // as long as the authentication middleware does this itself in
+            // order to follow the Stack authn/authz conventions.
+            return \Stack\Security\delegate_authorization(
+                $this->app,
+                function (Response $response) {
 
-            if ($response->getStatusCode()==401 && !$request->headers->has('WWW-Authenticate')) {
-                $response->headers->set('WWW-Authenticate', 'Hawk');
-            }
+                    // We could in theory completely change the Response object
+                    // to something new or add additional headers.
 
-            return $response;
+                    $response->headers->set('WWW-Authenticate', 'Hawk');
+
+                    return $response;
+                },
+                $request,
+                $type,
+                $catch
+            );
         };
 
-        if (!$request->headers->has('authorization')) {
-            // We are only interested in requests with a authorization header.
+        $firewalls = isset($this->container['firewalls'])
+            ? $this->container['firewalls']
+            : [];
+
+        $firewall = \Stack\Security\resolve_firewall($request, $firewalls);
+
+        if (null === $firewall) {
             return call_user_func($delegate);
+        }
+
+        if (!$request->headers->has('authorization')) {
+            if ($firewall['anonymous']) {
+                return call_user_func($delegate);
+            }
+
+            $response = (new Response)->setStatusCode(401);
+            $response->headers->set('WWW-Authenticate', 'Hawk');
+            return $response;
         }
 
         try {

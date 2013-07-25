@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "684c8ba7d9f404a8fd156057c6894fe0",
+    "hash": "5d120e36749d626b70af4cf52e8862c1",
     "packages": [
         {
             "name": "dflydev/hawk",
@@ -169,6 +169,42 @@
                 "psr-3"
             ],
             "time": "2012-12-21 11:40:51"
+        },
+        {
+            "name": "stack/security",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/simensen/stack-security.git",
+                "reference": "71ebe086945c42ffdd6b17f2de3f23f5aaf68c2b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/simensen/stack-security/zipball/71ebe086945c42ffdd6b17f2de3f23f5aaf68c2b",
+                "reference": "71ebe086945c42ffdd6b17f2de3f23f5aaf68c2b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "symfony/http-foundation": "~2.1",
+                "symfony/http-kernel": "~2.1"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/functions.php"
+                ]
+            },
+            "support": {
+                "source": "https://github.com/simensen/stack-security/tree/master",
+                "issues": "https://github.com/simensen/stack-security/issues"
+            },
+            "time": "2013-07-25 21:56:59"
         },
         {
             "name": "symfony/debug",
@@ -1210,6 +1246,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "dflydev/hawk": 20,
+        "stack/security": 20,
         "ircmaxell/random-lib": 20,
         "ircmaxell/security-lib": 20,
         "silex/silex": 20,
