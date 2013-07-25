@@ -31,7 +31,9 @@ class SilexApplicationTest extends TestCase
     /** @test */
     public function shouldChallengeForProtectedResourceNoHeader()
     {
-        $app = $this->hawkify($this->createTestApp());
+        $app = $this->hawkify($this->createTestApp(), ['firewalls' => [
+            ['path' => '/', 'anonymous' => true],
+        ]]);
 
         $client = new Client($app);
 
@@ -179,7 +181,10 @@ class SilexApplicationTest extends TestCase
             }
 
             if (!$request->attributes->has('stack.authentication.token')) {
-                return (new Response)->setStatusCode(401);
+                $response = (new Response)->setStatusCode(401);
+                $response->headers->set('WWW-Authenticate', 'Stack');
+
+                return $response;
             }
         });
 
