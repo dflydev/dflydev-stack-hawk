@@ -7,9 +7,11 @@ use Dflydev\Hawk\Time\TimeProviderInterface;
 use Dflydev\Stack\Hawk;
 use Pimple;
 use Silex\Application;
+use Stack\Inline;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Client;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class SilexApplicationTest extends TestCase
 {
@@ -129,6 +131,30 @@ class SilexApplicationTest extends TestCase
         $client->request('GET', $resource, [], [], ['HTTP_AUTHORIZATION' => $hawkRequest->header()->fieldValue()]);
         $this->assertEquals($expectedContent, $client->getResponse()->getContent());
         $this->assertFalse($client->getResponse()->headers->has('Server-Authorization'));
+    }
+
+    /**
+     * @test
+     */
+    public function shouldConvertWwwAuthenticateStackToHawk()
+    {
+        $app = $this->hawkify(new Inline($this->createTestApp(), function(
+            HttpKernelInterface $app,
+            Request $request,
+            $type = HttpKernelInterface::MASTER_REQUEST,
+            $catch = true
+        ) {
+            // Simulate Authorization failure by returning 401 status
+            // code with WWW-Authenticate: Stack.
+            $response = (new Response)->setStatusCode(401);
+            $response->headers->set('WWW-Authenticate', 'Stack');
+            return $response;
+        }));
+
+        $client = new Client($app);
+
+        $client->request('GET', '/');
+        $this->assertEquals('Hawk', $client->getResponse()->headers->get('WWW-Authenticate'));
     }
 
     protected function createTestApp()

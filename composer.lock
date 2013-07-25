@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "5d120e36749d626b70af4cf52e8862c1",
+    "hash": "44da561a21ae2873ab7022c3bc3f084c",
     "packages": [
         {
             "name": "dflydev/hawk",
@@ -1027,6 +1027,60 @@
             "time": "2013-05-17 16:07:54"
         },
         {
+            "name": "stack/inline",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stackphp/inline.git",
+                "reference": "31d8ca1efaa8680c20bc3229e441c8733ce84899"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stackphp/inline/zipball/31d8ca1efaa8680c20bc3229e441c8733ce84899",
+                "reference": "31d8ca1efaa8680c20bc3229e441c8733ce84899",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "symfony/http-foundation": "~2.1",
+                "symfony/http-kernel": "~2.1"
+            },
+            "require-dev": {
+                "silex/silex": "~1.0@dev",
+                "stack/builder": "~1.0@dev",
+                "stack/callable-http-kernel": "~1.0@dev"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Stack": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Igor Wiedler",
+                    "email": "igor@wiedler.ch",
+                    "homepage": "http://wiedler.ch/igor/"
+                }
+            ],
+            "description": "Inline stack middleware.",
+            "keywords": [
+                "callable",
+                "inline",
+                "stack"
+            ],
+            "time": "2013-04-09 15:57:37"
+        },
+        {
             "name": "symfony/browser-kit",
             "version": "v2.3.2",
             "target-dir": "Symfony/Component/BrowserKit",
@@ -1251,7 +1305,8 @@
         "ircmaxell/security-lib": 20,
         "silex/silex": 20,
         "stack/builder": 20,
-        "stack/callable-http-kernel": 20
+        "stack/callable-http-kernel": 20,
+        "stack/inline": 20
     },
     "platform": {
         "php": ">=5.4.0"

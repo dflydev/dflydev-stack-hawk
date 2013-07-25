@@ -30,6 +30,7 @@
         "silex/silex": "1.1.*@dev",
         "stack/builder": "~1.0@dev",
         "stack/callable-http-kernel": "~1.0@dev",
+        "stack/inline": "~1.0@dev",
         "symfony/browser-kit": "~2.1"
     },
     "extra": {
