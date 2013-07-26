@@ -47,6 +47,31 @@ class SilexApplicationTest extends TestCase
 
     /**
      * @test
+     */
+    public function shouldGetExpectedToken()
+    {
+        $timeProvider = new MockTimeProvider(56789);
+        $app = $this->hawkify($this->createTestApp(), ['time_provider' => $timeProvider]);
+
+        $hawkClient = (new \Dflydev\Hawk\Client\ClientBuilder)
+            ->setTimeProvider($timeProvider)
+            ->build();
+
+        $hawkRequest = $hawkClient->createRequest(
+            $this->credentials,
+            'http://localhost/protected/token',
+            'GET',
+            array()
+        );
+
+        $client = new Client($app);
+
+        $client->request('GET', '/protected/token', [], [], ['HTTP_AUTHORIZATION' => $hawkRequest->header()->fieldValue()]);
+        $this->assertEquals($this->credentials->id(), $client->getResponse()->getContent());
+    }
+
+    /**
+     * @test
      * @dataProvider protectedAndUnprotectedResources
      */
     public function shouldChallengeForInvalidHeader($resource)
@@ -88,8 +113,6 @@ class SilexApplicationTest extends TestCase
             array()
         );
 
-        $this->assertEquals('Authorization', $hawkRequest->header()->fieldName());
-
         $client = new Client($app);
 
         $client->request('GET', $resource, [], [], ['HTTP_AUTHORIZATION' => $hawkRequest->header()->fieldValue()]);
@@ -130,8 +153,6 @@ class SilexApplicationTest extends TestCase
             'GET',
             array()
         );
-
-        $this->assertEquals('Authorization', $hawkRequest->header()->fieldName());
 
         $client = new Client($app);
 
@@ -327,8 +348,8 @@ class SilexApplicationTest extends TestCase
             return 'Protected Resource.';
         });
 
-        $app->get('/protected/token', function () {
-            return 'Protected Resource.';
+        $app->get('/protected/token', function (Request $request) {
+            return $request->attributes->get('stack.authentication.token');
         });
 
         $app->post('/posts', function () {
