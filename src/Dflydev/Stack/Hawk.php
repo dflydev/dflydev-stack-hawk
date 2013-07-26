@@ -88,7 +88,7 @@ class Hawk implements HttpKernelInterface
                 $request->getHost(),
                 $request->getPort(),
                 $request->getRequestUri(),
-                $request->getContentType(),
+                $request->headers->get('content-type'),
                 $request->getContent() ?: null,
                 $header
             );
@@ -111,13 +111,16 @@ class Hawk implements HttpKernelInterface
         $response = call_user_func($delegate);
 
         if ($this->container['sign_response']) {
+            $options = [];
+            if ($this->container['validate_payload_response']) {
+                $options['payload'] = $response->getContent();
+                $options['content_type'] = $response->headers->get('content-type');
+            }
+
             $header = $this->container['server']->createHeader(
                 $authenticationResponse->credentials(),
                 $authenticationResponse->artifacts(),
-                array(
-                    'payload' => $response->getContent(),
-                    'content_type' => $response->headers->get('content-type'),
-                )
+                $options
             );
 
             $response->headers->set($header->fieldName(), $header->fieldValue());
@@ -145,6 +148,7 @@ class Hawk implements HttpKernelInterface
 
         $c = new Pimple([
             'sign_response' => true,
+            'validate_payload_response' => true,
         ]);
 
         $c['crypto'] = $c->share(function () {

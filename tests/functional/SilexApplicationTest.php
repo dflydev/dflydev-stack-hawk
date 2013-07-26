@@ -3,6 +3,8 @@
 namespace functional;
 
 use common\TestCase;
+use Dflydev\Hawk\Credentials\Credentials;
+use Dflydev\Hawk\Nonce\NonceProviderInterface;
 use Dflydev\Hawk\Time\TimeProviderInterface;
 use Dflydev\Stack\Hawk;
 use Pimple;
@@ -101,6 +103,8 @@ class SilexApplicationTest extends TestCase
                 'content_type' => $client->getResponse()->headers->get('content-type'),
             ]
         );
+
+        $this->assertTrue($authenticatedResponse);
     }
 
     /**
@@ -159,6 +163,145 @@ class SilexApplicationTest extends TestCase
         $this->assertEquals('Hawk', $client->getResponse()->headers->get('WWW-Authenticate'));
     }
 
+    /**
+     * @test
+     */
+    public function shouldPassTentTestVectorsAppRequestWithHash()
+    {
+        $timeProvider = new MockTimeProvider(1368996800);
+        $nonceProvider = new MockNonceProvider('3yuYCD4Z');
+        $credentials = new Credentials('HX9QcbD-r3ItFEnRcAuOSg', 'sha256', 'exqbZWtykFZIh2D7cXi9dA');
+
+        $app = $this->hawkify($this->createTestApp(), [
+            'validate_payload_response' => false, // this test actually has no payload validaton
+            'time_provider' => $timeProvider,
+            'credentials_provider' => function ($id) use ($credentials) {
+                if ($credentials->id() === $id) {
+                    return $credentials;
+                }
+            }
+        ]);
+
+        $hawkClient = (new \Dflydev\Hawk\Client\ClientBuilder)
+            ->setTimeProvider($timeProvider)
+            ->setNonceProvider($nonceProvider)
+            ->build();
+
+        $hawkRequest = $hawkClient->createRequest(
+            $credentials,
+            'https://example.com/posts',
+            'POST',
+            [
+                'payload' => '{"type":"https://tent.io/types/status/v0#"}',
+                'content_type' => 'application/vnd.tent.post.v0+json',
+                'app' => 'wn6yzHGe5TLaT-fvOPbAyQ',
+            ]
+        );
+
+        $this->assertEquals('Authorization', $hawkRequest->header()->fieldName());
+
+        $client = new Client($app);
+
+        $client->request(
+            'POST',
+            'https://example.com/posts',
+            [],
+            [],
+            [
+                'HTTP_AUTHORIZATION' => $hawkRequest->header()->fieldValue(),
+                'CONTENT_TYPE' => 'application/vnd.tent.post.v0+json',
+            ],
+            '{"type":"https://tent.io/types/status/v0#"}'
+        );
+
+        $this->assertEquals('{"type":"https://tent.io/types/status/v0#"}', $client->getResponse()->getContent());
+
+        $this->assertEquals(
+            'Hawk mac="lTG3kTBr33Y97Q4KQSSamu9WY/mOUKnZzq/ho9x+yxw="',
+            $client->getResponse()->headers->get('Server-Authorization')
+        );
+
+        $authenticatedResponse = $hawkClient->authenticate(
+            $credentials,
+            $hawkRequest,
+            $client->getResponse()->headers->get('Server-Authorization'),
+            [
+                //'payload' => $client->getResponse()->getContent(),
+                //'content_type' => $client->getResponse()->headers->get('content-type'),
+            ]
+        );
+
+        $this->assertTrue($authenticatedResponse);
+    }
+
+
+    /**
+     * @test
+     */
+    public function shouldPassTentTestVectorsRelationshipRequestWithHash()
+    {
+        $timeProvider = new MockTimeProvider(1368996800);
+        $nonceProvider = new MockNonceProvider('3yuYCD4Z');
+        $credentials = new Credentials('HX9QcbD-r3ItFEnRcAuOSg', 'sha256', 'exqbZWtykFZIh2D7cXi9dA');
+
+        $app = $this->hawkify($this->createTestApp(), [
+            'time_provider' => $timeProvider,
+            'credentials_provider' => function ($id) use ($credentials) {
+                if ($credentials->id() === $id) {
+                    return $credentials;
+                }
+            }
+        ]);
+
+        $hawkClient = (new \Dflydev\Hawk\Client\ClientBuilder)
+            ->setTimeProvider($timeProvider)
+            ->setNonceProvider($nonceProvider)
+            ->build();
+
+        $hawkRequest = $hawkClient->createRequest(
+            $credentials,
+            'https://example.com/posts',
+            'POST',
+            [
+                'payload' => '{"type":"https://tent.io/types/status/v0#"}',
+                'content_type' => 'application/vnd.tent.post.v0+json',
+            ]
+        );
+
+        $this->assertEquals('Authorization', $hawkRequest->header()->fieldName());
+
+        $client = new Client($app);
+
+        $client->request(
+            'POST',
+            'https://example.com/posts',
+            [],
+            [],
+            [
+                'HTTP_AUTHORIZATION' => $hawkRequest->header()->fieldValue(),
+                'CONTENT_TYPE' => 'application/vnd.tent.post.v0+json',
+            ],
+            '{"type":"https://tent.io/types/status/v0#"}'
+        );
+
+        $this->assertEquals(
+            'Hawk mac="LvxASIZ2gop5cwE2mNervvz6WXkPmVslwm11MDgEZ5E=", hash="neQFHgYKl/jFqDINrC21uLS0gkFglTz789rzcSr7HYU="',
+            $client->getResponse()->headers->get('Server-Authorization')
+        );
+
+        $authenticatedResponse = $hawkClient->authenticate(
+            $credentials,
+            $hawkRequest,
+            $client->getResponse()->headers->get('Server-Authorization'),
+            [
+                'payload' => $client->getResponse()->getContent(),
+                'content_type' => $client->getResponse()->headers->get('content-type'),
+            ]
+        );
+
+        $this->assertTrue($authenticatedResponse);
+    }
+
     protected function createTestApp()
     {
         $app = new Application;
@@ -170,6 +313,20 @@ class SilexApplicationTest extends TestCase
 
         $app->get('/protected/resource', function () {
             return 'Protected Resource.';
+        });
+
+        $app->get('/protected/token', function () {
+            return 'Protected Resource.';
+        });
+
+        $app->post('/posts', function () {
+            $response = (new Response)
+                ->setStatusCode(200)
+                ->setContent('{"type":"https://tent.io/types/status/v0#"}');
+
+            $response->headers->set('Content-Type', 'application/vnd.tent.post.v0+json');
+
+            return $response;
         });
 
         // Simple Silex middleware to always let certain requests go through
@@ -197,6 +354,21 @@ class SilexApplicationTest extends TestCase
             ['/', 'Root.'],
             ['/protected/resource', 'Protected Resource.'],
         ];
+    }
+}
+
+class MockNonceProvider implements NonceProviderInterface
+{
+    private $nonce;
+
+    public function __construct($nonce)
+    {
+        $this->nonce = $nonce;
+    }
+
+    public function createNonce()
+    {
+        return $this->nonce;
     }
 }
 
