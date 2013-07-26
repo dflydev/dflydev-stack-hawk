@@ -11,12 +11,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dflydev/dflydev-hawk.git",
-                "reference": "7eb96a3df6d5554903d2448d23ce8cb1b0c398de"
+                "reference": "e4c58582908e7c7c3c7624b489b94d7b500acfcf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dflydev/dflydev-hawk/zipball/7eb96a3df6d5554903d2448d23ce8cb1b0c398de",
-                "reference": "7eb96a3df6d5554903d2448d23ce8cb1b0c398de",
+                "url": "https://api.github.com/repos/dflydev/dflydev-hawk/zipball/e4c58582908e7c7c3c7624b489b94d7b500acfcf",
+                "reference": "e4c58582908e7c7c3c7624b489b94d7b500acfcf",
                 "shasum": ""
             },
             "require": {
@@ -41,7 +41,7 @@
                 "source": "https://github.com/dflydev/dflydev-hawk/tree/master",
                 "issues": "https://github.com/dflydev/dflydev-hawk/issues"
             },
-            "time": "2013-07-26 04:21:46"
+            "time": "2013-07-26 15:00:35"
         },
         {
             "name": "ircmaxell/random-lib",

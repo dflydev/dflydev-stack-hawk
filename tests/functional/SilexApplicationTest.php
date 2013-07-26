@@ -4,6 +4,7 @@ namespace functional;
 
 use common\TestCase;
 use Dflydev\Hawk\Credentials\Credentials;
+use Dflydev\Hawk\Header\HeaderFactory;
 use Dflydev\Hawk\Nonce\NonceProviderInterface;
 use Dflydev\Hawk\Time\TimeProviderInterface;
 use Dflydev\Stack\Hawk;
@@ -166,7 +167,7 @@ class SilexApplicationTest extends TestCase
     /**
      * @test
      */
-    public function shouldPassTentTestVectorsAppRequestWithHash()
+    public function shouldPassTentTestVectorsAppRequest()
     {
         $timeProvider = new MockTimeProvider(1368996800);
         $nonceProvider = new MockNonceProvider('3yuYCD4Z');
@@ -198,7 +199,13 @@ class SilexApplicationTest extends TestCase
             ]
         );
 
-        $this->assertEquals('Authorization', $hawkRequest->header()->fieldName());
+        $expectedHeader = HeaderFactory::createFromString(
+            'Authorization',
+            'Hawk id="exqbZWtykFZIh2D7cXi9dA", mac="2sttHCQJG9ejj1x7eCi35FP23Miu9VtlaUgwk68DTpM=", ts="1368996800", nonce="3yuYCD4Z", hash="neQFHgYKl/jFqDINrC21uLS0gkFglTz789rzcSr7HYU=", app="wn6yzHGe5TLaT-fvOPbAyQ"'
+        );
+
+        $this->assertEquals($expectedHeader->fieldName(), $hawkRequest->header()->fieldName());
+        $this->assertEquals($expectedHeader->attributes(), $hawkRequest->header()->attributes());
 
         $client = new Client($app);
 
@@ -238,13 +245,14 @@ class SilexApplicationTest extends TestCase
     /**
      * @test
      */
-    public function shouldPassTentTestVectorsRelationshipRequestWithHash()
+    public function shouldPassTentTestVectorsRelationshipRequest()
     {
         $timeProvider = new MockTimeProvider(1368996800);
         $nonceProvider = new MockNonceProvider('3yuYCD4Z');
         $credentials = new Credentials('HX9QcbD-r3ItFEnRcAuOSg', 'sha256', 'exqbZWtykFZIh2D7cXi9dA');
 
         $app = $this->hawkify($this->createTestApp(), [
+            'validate_payload_request' => false,
             'time_provider' => $timeProvider,
             'credentials_provider' => function ($id) use ($credentials) {
                 if ($credentials->id() === $id) {
@@ -263,12 +271,16 @@ class SilexApplicationTest extends TestCase
             'https://example.com/posts',
             'POST',
             [
-                'payload' => '{"type":"https://tent.io/types/status/v0#"}',
-                'content_type' => 'application/vnd.tent.post.v0+json',
             ]
         );
 
-        $this->assertEquals('Authorization', $hawkRequest->header()->fieldName());
+        $expectedHeader = HeaderFactory::createFromString(
+            'Authorization',
+            'Hawk id="exqbZWtykFZIh2D7cXi9dA", mac="OO2ldBDSw8KmNHlEdTC4BciIl8+uiuCRvCnJ9KkcR3Y=", ts="1368996800", nonce="3yuYCD4Z"'
+        );
+
+        $this->assertEquals($expectedHeader->fieldName(), $hawkRequest->header()->fieldName());
+        $this->assertEquals($expectedHeader->attributes(), $hawkRequest->header()->attributes());
 
         $client = new Client($app);
 
