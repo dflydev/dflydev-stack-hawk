@@ -21,46 +21,64 @@ class Hawk implements HttpKernelInterface
 
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        $delegate = function () use ($request, $type, $catch) {
-            return \Stack\Security\delegate_authorization(
-                $this->app,
-                function (Response $response) {
-                    $response->headers->set('WWW-Authenticate', 'Hawk');
+        // The challenge callback is used to massage the Response per Stack
+        // Authentication and Authorization conventitons. It will be called
+        // by authenticate() if a 401 response is detected that has a
+        // "WWW-Authenticate: Stack" header.
+        $challenge = function (Response $response) {
+            $response->headers->set('WWW-Authenticate', 'Hawk');
 
-                    return $response;
-                },
-                $request,
-                $type,
-                $catch
-            );
+            return $response;
         };
 
         $firewalls = isset($this->container['firewalls'])
             ? $this->container['firewalls']
             : [];
 
-        $firewall = \Stack\Security\resolve_firewall($request, $firewalls);
+        // Use a helper fuctnion to work with Stack conventions for firewall
+        // configuration and authoriation delegation.
+        list ($isResponse, $value, $firewall) = \Stack\Security\authenticate(
+            $this->app,
+            $challenge,
+            $firewalls,
+            $request,
+            $type,
+            $catch
+        );
 
-        if (null === $firewall) {
-            return call_user_func($delegate);
+        if ($isResponse) {
+            // If our value represents a response we should immediately
+            // pass it back.
+            return $value;
         }
 
-        if (!$request->headers->has('authorization')) {
-            if ($firewall['anonymous']) {
-                return call_user_func($delegate);
-            }
+        // Otherwise, the value represents a delegate.
+        $delegate = $value;
 
-            $response = (new Response)->setStatusCode(401);
-            $response->headers->set('WWW-Authenticate', 'Hawk');
-            return $response;
-        }
+
+        //
+        // At this point we know for certain that Hawk authentication is
+        // expected to be possible for this request *and* that this request
+        // has an authorization header.
+        //
 
         try {
             $header = HeaderFactory::createFromString('Authorization', $request->headers->get('authorization'));
         } catch (NotHawkAuthorizationException $e) {
-            // We are only interested in requests with a HAWK authorization header.
-            return call_user_func($delegate);
+            if ($firewall['anonymous']) {
+                // If anonymous requests are allowed by our firewall we should
+                // hand off to the delegate.
+                return call_user_func($delegate);
+            }
+
+            // Otherwise, we should challenge immediately.
+            // We use $challenge to be slightly more DRY.
+            $response = (new Response)->setStatusCode(401);
+            call_user_func($challenge, $response);
+
+            return $response;
         } catch (FieldValueParserException $e) {
+            // Something horribly wrong has happened.
             return (new Response)->setStatusCode(400);
         }
 

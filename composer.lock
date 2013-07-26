@@ -176,12 +176,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/simensen/stack-security.git",
-                "reference": "b670887f182e88a763e68961b6ea43417f171e81"
+                "reference": "74572a60378b5cd2cddbcbc0d2a50915a103ca33"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/simensen/stack-security/zipball/b670887f182e88a763e68961b6ea43417f171e81",
-                "reference": "b670887f182e88a763e68961b6ea43417f171e81",
+                "url": "https://api.github.com/repos/simensen/stack-security/zipball/74572a60378b5cd2cddbcbc0d2a50915a103ca33",
+                "reference": "74572a60378b5cd2cddbcbc0d2a50915a103ca33",
                 "shasum": ""
             },
             "require": {
@@ -204,7 +204,7 @@
                 "source": "https://github.com/simensen/stack-security/tree/master",
                 "issues": "https://github.com/simensen/stack-security/issues"
             },
-            "time": "2013-07-25 22:28:10"
+            "time": "2013-07-26 02:48:42"
         },
         {
             "name": "symfony/debug",
