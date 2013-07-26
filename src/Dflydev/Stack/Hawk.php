@@ -22,7 +22,7 @@ class Hawk implements HttpKernelInterface
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         // The challenge callback is used to massage the Response per Stack
-        // Authentication and Authorization conventitons. It will be called
+        // Authentication and Authorization conventions. It will be called
         // by authenticate() if a 401 response is detected that has a
         // "WWW-Authenticate: Stack" header.
         $challenge = function (Response $response) {
@@ -35,8 +35,8 @@ class Hawk implements HttpKernelInterface
             ? $this->container['firewalls']
             : [];
 
-        // Use a helper fuctnion to work with Stack conventions for firewall
-        // configuration and authoriation delegation.
+        // Use a helper function to work with Stack conventions for firewall
+        // configuration and authorization delegation.
         list ($isResponse, $value, $firewall) = \Stack\Security\authenticate(
             $this->app,
             $challenge,
