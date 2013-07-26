@@ -166,52 +166,6 @@ class SilexApplicationTest extends TestCase
      */
     public function shouldConvertWwwAuthenticateStackToHawk()
     {
-        $app = $this->hawkify(new Inline($this->createTestApp(), function(
-            HttpKernelInterface $app,
-            Request $request,
-            $type = HttpKernelInterface::MASTER_REQUEST,
-            $catch = true
-        ) {
-            // Simulate Authorization failure by returning 401 status
-            // code with WWW-Authenticate: Stack.
-            $response = (new Response)->setStatusCode(401);
-            $response->headers->set('WWW-Authenticate', 'Stack');
-            return $response;
-        }));
-
-        $client = new Client($app);
-
-        $client->request('GET', '/');
-        $this->assertEquals('Hawk', $client->getResponse()->headers->get('WWW-Authenticate'));
-    }
-
-    /**
-     * @test
-     */
-    public function shouldNotClobberExistingToken()
-    {
-        $app = new Inline($this->hawkify($this->createTestApp()), function(
-            HttpKernelInterface $app,
-            Request $request,
-            $type = HttpKernelInterface::MASTER_REQUEST,
-            $catch = true
-        ) {
-            $request->attributes->set('stack.authentication.token', 'foo');
-
-            return $app->handle($request, $type, $catch);
-        });
-
-        $client = new Client($app);
-
-        $client->request('GET', '/protected/token');
-        $this->assertEquals('foo', $client->getResponse()->getContent());
-    }
-
-    /**
-     * @test
-     */
-    public function shouldChallengeOnAuthorizationEvenIfOtherMiddlewareAuthenticated()
-    {
         $authz = function(
             HttpKernelInterface $app,
             Request $request,
@@ -225,7 +179,20 @@ class SilexApplicationTest extends TestCase
             return $response;
         };
 
-        $app = new Inline($this->hawkify(new Inline($this->createTestApp(), $authz)), function(
+        $app = $this->hawkify(new Inline($this->createTestApp(), $authz));
+
+        $client = new Client($app);
+
+        $client->request('GET', '/');
+        $this->assertEquals('Hawk', $client->getResponse()->headers->get('WWW-Authenticate'));
+    }
+
+    /**
+     * @test
+     */
+    public function shouldNotClobberExistingToken()
+    {
+        $authnMiddleware = function(
             HttpKernelInterface $app,
             Request $request,
             $type = HttpKernelInterface::MASTER_REQUEST,
@@ -237,7 +204,49 @@ class SilexApplicationTest extends TestCase
             // Hawk should actually capture the WWW-Authenticate: Stack response
             // and challenge on its own.
             return $app->handle($request, $type, $catch);
-        });
+        };
+
+        $app = new Inline($this->hawkify($this->createTestApp()), $authnMiddleware);
+
+        $client = new Client($app);
+
+        $client->request('GET', '/protected/token');
+        $this->assertEquals('foo', $client->getResponse()->getContent());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldChallengeOnAuthorizationEvenIfOtherMiddlewareAuthenticated()
+    {
+        $authnMiddleware = function(
+            HttpKernelInterface $app,
+            Request $request,
+            $type = HttpKernelInterface::MASTER_REQUEST,
+            $catch = true
+        ) {
+            // We are going to claim that we authenticated...
+            $request->attributes->set('stack.authentication.token', 'foo');
+
+            // Hawk should actually capture the WWW-Authenticate: Stack response
+            // and challenge on its own.
+            return $app->handle($request, $type, $catch);
+        };
+
+        $authzMiddleware = function(
+            HttpKernelInterface $app,
+            Request $request,
+            $type = HttpKernelInterface::MASTER_REQUEST,
+            $catch = true
+        ) {
+            // Simulate Authorization failure by returning 401 status
+            // code with WWW-Authenticate: Stack.
+            $response = (new Response)->setStatusCode(401);
+            $response->headers->set('WWW-Authenticate', 'Stack');
+            return $response;
+        };
+
+        $app = new Inline($this->hawkify(new Inline($this->createTestApp(), $authzMiddleware)), $authnMiddleware);
 
         $client = new Client($app);
 
