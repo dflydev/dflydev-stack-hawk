@@ -199,7 +199,7 @@ class SilexApplicationTest extends TestCase
             $catch = true
         ) {
             // We are going to claim that we authenticated...
-            $request->attributes->set('stack.authentication.token', 'foo');
+            $request->attributes->set('stack.authn.token', 'foo');
 
             // Hawk should actually capture the WWW-Authenticate: Stack response
             // and challenge on its own.
@@ -226,7 +226,7 @@ class SilexApplicationTest extends TestCase
             $catch = true
         ) {
             // We are going to claim that we authenticated...
-            $request->attributes->set('stack.authentication.token', 'foo');
+            $request->attributes->set('stack.authn.token', 'foo');
 
             // Hawk should actually capture the WWW-Authenticate: Stack response
             // and challenge on its own.
@@ -419,7 +419,7 @@ class SilexApplicationTest extends TestCase
         });
 
         $app->get('/protected/token', function (Request $request) {
-            return $request->attributes->get('stack.authentication.token');
+            return $request->attributes->get('stack.authn.token');
         });
 
         $app->post('/posts', function () {
@@ -434,13 +434,13 @@ class SilexApplicationTest extends TestCase
 
         // Simple Silex middleware to always let certain requests go through
         // and to always throw 401 responses in all other cases *unless*
-        // stack.authentication.token has been set correctly.
+        // stack.authn.token has been set correctly.
         $app->before(function (Request $request) {
             if (in_array($request->getRequestUri(), array('/'))) {
                 return;
             }
 
-            if (!$request->attributes->has('stack.authentication.token')) {
+            if (!$request->attributes->has('stack.authn.token')) {
                 $response = (new Response)->setStatusCode(401);
                 $response->headers->set('WWW-Authenticate', 'Stack');
 

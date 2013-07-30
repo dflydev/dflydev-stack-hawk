@@ -13,6 +13,9 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class Hawk implements HttpKernelInterface
 {
+    private $app;
+    private $container;
+
     public function __construct(HttpKernelInterface $app, array $options = array())
     {
         $this->app = $app;
@@ -65,18 +68,7 @@ class Hawk implements HttpKernelInterface
         try {
             $header = HeaderFactory::createFromString('Authorization', $request->headers->get('authorization'));
         } catch (NotHawkAuthorizationException $e) {
-            if ($firewall['anonymous']) {
-                // If anonymous requests are allowed by our firewall we should
-                // hand off to the delegate.
-                return call_user_func($delegate);
-            }
-
-            // Otherwise, we should challenge immediately.
-            // We use $challenge to be slightly more DRY.
-            $response = (new Response)->setStatusCode(401);
-            call_user_func($challenge, $response);
-
-            return $response;
+            return \Stack\Security\delegate_missing_authentication($firewall, $delegate, $challenge);
         } catch (FieldValueParserException $e) {
             // Something horribly wrong has happened.
             return (new Response)->setStatusCode(400);
@@ -105,7 +97,10 @@ class Hawk implements HttpKernelInterface
         }
 
         // Compatiblity with standard Stack authorization
-        $request->attributes->set('stack.authentication.token', $authenticationResponse->credentials()->id());
+        $request->attributes->set(
+            'stack.authn.token',
+            $this->container['token_translator']($authenticationResponse->credentials())
+        );
 
         // Hawk specific information
         $request->attributes->set('hawk.credentials', $authenticationResponse->credentials());
@@ -170,8 +165,12 @@ class Hawk implements HttpKernelInterface
             return $builder->build();
         });
 
+        $c['token_translator'] = $c->protect(function ($credentials) {
+            return $credentials->id();
+        });
+
         foreach ($options as $name => $value) {
-            if (in_array($name, ['crypto', 'server', 'time_provider'])) {
+            if (in_array($name, ['crypto', 'server', 'time_provider', 'token_translator'])) {
                 if (is_callable($value)) {
                     $c[$name] = $c->share($value);
                 } else {
