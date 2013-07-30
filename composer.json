@@ -20,10 +20,7 @@
         "dflydev/hawk": "1.0.*@dev",
         "stack/security": "1.0.*@dev",
         "symfony/http-foundation": "~2.1",
-        "symfony/http-kernel": "~2.1",
-
-        "ircmaxell/random-lib": "@dev",
-        "ircmaxell/security-lib": "@dev"
+        "symfony/http-kernel": "~2.1"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.21",

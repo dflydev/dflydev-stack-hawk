@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "44da561a21ae2873ab7022c3bc3f084c",
+    "hash": "71dfb50c2f274d4a1bc752f94ba615fc",
     "packages": [
         {
             "name": "dflydev/hawk",
@@ -11,17 +11,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dflydev/dflydev-hawk.git",
-                "reference": "e4c58582908e7c7c3c7624b489b94d7b500acfcf"
+                "reference": "a3395b8ae4c8b5ff49919b67dbdd080c4bee953c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dflydev/dflydev-hawk/zipball/e4c58582908e7c7c3c7624b489b94d7b500acfcf",
-                "reference": "e4c58582908e7c7c3c7624b489b94d7b500acfcf",
+                "url": "https://api.github.com/repos/dflydev/dflydev-hawk/zipball/a3395b8ae4c8b5ff49919b67dbdd080c4bee953c",
+                "reference": "a3395b8ae4c8b5ff49919b67dbdd080c4bee953c",
                 "shasum": ""
             },
             "require": {
-                "ircmaxell/random-lib": "dev-master",
-                "ircmaxell/security-lib": "dev-master"
+                "ircmaxell/random-lib": "1.0.*@dev"
             },
             "require-dev": {
                 "phpunit/phpunit": "3.7.21"
@@ -41,30 +40,35 @@
                 "source": "https://github.com/dflydev/dflydev-hawk/tree/master",
                 "issues": "https://github.com/dflydev/dflydev-hawk/issues"
             },
-            "time": "2013-07-26 15:00:35"
+            "time": "2013-07-30 18:03:12"
         },
         {
             "name": "ircmaxell/random-lib",
-            "version": "dev-master",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ircmaxell/RandomLib.git",
-                "reference": "53597c59af81d08444b9dd4e121cdefc354c00a4"
+                "reference": "v1.0.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ircmaxell/RandomLib/zipball/53597c59af81d08444b9dd4e121cdefc354c00a4",
-                "reference": "53597c59af81d08444b9dd4e121cdefc354c00a4",
+                "url": "https://api.github.com/repos/ircmaxell/RandomLib/zipball/v1.0.0",
+                "reference": "v1.0.0",
                 "shasum": ""
             },
             "require": {
-                "ircmaxell/security-lib": "dev-master",
+                "ircmaxell/security-lib": "1.0.*@dev",
                 "php": ">=5.3.2"
             },
             "require-dev": {
                 "mikey179/vfsstream": "1.1.*"
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
             "autoload": {
                 "psr-0": {
                     "RandomLib": "lib"
@@ -89,20 +93,20 @@
                 "random-numbers",
                 "random-strings"
             ],
-            "time": "2013-06-25 13:09:53"
+            "time": "2013-07-30 17:40:57"
         },
         {
             "name": "ircmaxell/security-lib",
-            "version": "dev-master",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ircmaxell/SecurityLib.git",
-                "reference": "b8ce85731e14940d92ff72274e8d19696b69a018"
+                "reference": "v1.0.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ircmaxell/SecurityLib/zipball/b8ce85731e14940d92ff72274e8d19696b69a018",
-                "reference": "b8ce85731e14940d92ff72274e8d19696b69a018",
+                "url": "https://api.github.com/repos/ircmaxell/SecurityLib/zipball/v1.0.0",
+                "reference": "v1.0.0",
                 "shasum": ""
             },
             "require": {
@@ -130,7 +134,7 @@
             ],
             "description": "A Base Security Library",
             "homepage": "https://github.com/ircmaxell/PHP-SecurityLib",
-            "time": "2013-02-13 17:23:59"
+            "time": "2013-04-30 18:00:34"
         },
         {
             "name": "psr/log",
@@ -634,16 +638,16 @@
         },
         {
             "name": "phpunit/php-token-stream",
-            "version": "1.1.5",
+            "version": "1.1.7",
             "source": {
                 "type": "git",
-                "url": "git://github.com/sebastianbergmann/php-token-stream.git",
-                "reference": "1.1.5"
+                "url": "https://github.com/sebastianbergmann/php-token-stream.git",
+                "reference": "1.1.7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/sebastianbergmann/php-token-stream/zipball/1.1.5",
-                "reference": "1.1.5",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/1.1.7",
+                "reference": "1.1.7",
                 "shasum": ""
             },
             "require": {
@@ -671,11 +675,11 @@
                 }
             ],
             "description": "Wrapper around PHP's tokenizer extension.",
-            "homepage": "http://www.phpunit.de/",
+            "homepage": "https://github.com/sebastianbergmann/php-token-stream/",
             "keywords": [
                 "tokenizer"
             ],
-            "time": "2012-10-11 04:47:14"
+            "time": "2013-07-29 14:27:06"
         },
         {
             "name": "phpunit/phpunit",
@@ -852,12 +856,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fabpot/Silex.git",
-                "reference": "4945dd0f7d6ad3e696b09bf980b7b1306e5fd1c8"
+                "reference": "e9bedd65873d6e20e2dd9eee9cde4723f10bcdb0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fabpot/Silex/zipball/4945dd0f7d6ad3e696b09bf980b7b1306e5fd1c8",
-                "reference": "4945dd0f7d6ad3e696b09bf980b7b1306e5fd1c8",
+                "url": "https://api.github.com/repos/fabpot/Silex/zipball/e9bedd65873d6e20e2dd9eee9cde4723f10bcdb0",
+                "reference": "e9bedd65873d6e20e2dd9eee9cde4723f10bcdb0",
                 "shasum": ""
             },
             "require": {
@@ -927,7 +931,7 @@
             "keywords": [
                 "microframework"
             ],
-            "time": "2013-07-19 10:22:31"
+            "time": "2013-07-27 05:29:38"
         },
         {
             "name": "stack/builder",
@@ -1301,8 +1305,6 @@
     "stability-flags": {
         "dflydev/hawk": 20,
         "stack/security": 20,
-        "ircmaxell/random-lib": 20,
-        "ircmaxell/security-lib": 20,
         "silex/silex": 20,
         "stack/builder": 20,
         "stack/callable-http-kernel": 20,
