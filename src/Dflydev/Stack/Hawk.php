@@ -24,21 +24,21 @@ class Hawk implements HttpKernelInterface
 
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        // The challenge callback is called to massage the Response per Stack
-        // Authentication and Authorization conventions. It will be called
-        // if a 401 response is detected that has a "WWW-Authenticate: Stack"
-        // header.
+        // The challenge callback is called if a 401 response is detected that
+        // has a "WWW-Authenticate: Stack" header. This is per the Stack
+        // Authentication and Authorization proposals. It is passed the existing
+        // response object.
         $challenge = function (Response $response) {
             $response->headers->set('WWW-Authenticate', 'Hawk');
 
             return $response;
         };
 
-        // The authenticate callback is called if the request could potentially
-        // contain authentication credentials for us to authentication. This
-        // means that there is no Stack authentication token yet but there is an
-        // authorization header. We are passed the app that we should delegate
-        // to in the event that we do not return something on our own.
+        // The authenticate callback is called if the request has no Stack
+        // authentication token but there is an authorization header. It is
+        // passed an app we should delegate to (assuming we do not return
+        // beforehand) and a boolean value indicating whether or not anonymous
+        // requests should be allowed.
         $authenticate = function ($app, $anonymous) use ($request, $type, $catch, $challenge) {
             try {
                 $header = HeaderFactory::createFromString(
@@ -210,7 +210,16 @@ class FirewallAuthentication implements HttpKernelInterface
             return $this->app->handle($request, $type, $catch);
         }
 
-        return (new Authentication($this->app, array_merge($this->options, ['anonymous' => $firewall['anonymous']])))
+        // Otherwise, we should attempt authentication and we should let the
+        // firewall dictate whether or not anonymous requests should be
+        // allowed.
+        return (new Authentication(
+                $this->app,
+                array_merge(
+                    $this->options,
+                    ['anonymous' => $firewall['anonymous']]
+                )
+            ))
             ->handle($request, $type, $catch);
     }
 
