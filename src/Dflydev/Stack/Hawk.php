@@ -24,107 +24,104 @@ class Hawk implements HttpKernelInterface
 
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        // The challenge callback is used to massage the Response per Stack
+        // The challenge callback is called to massage the Response per Stack
         // Authentication and Authorization conventions. It will be called
-        // by authenticate() if a 401 response is detected that has a
-        // "WWW-Authenticate: Stack" header.
+        // if a 401 response is detected that has a "WWW-Authenticate: Stack"
+        // header.
         $challenge = function (Response $response) {
             $response->headers->set('WWW-Authenticate', 'Hawk');
 
             return $response;
         };
 
-        $firewalls = isset($this->container['firewalls'])
-            ? $this->container['firewalls']
-            : [];
+        // The authenticate callback is called if the request could potentially
+        // contain authentication credentials for us to authentication. This
+        // means that there is no Stack authentication token yet but there is an
+        // authorization header. We are passed the app that we should delegate
+        // to in the event that we do not return something on our own.
+        $authenticate = function ($app, $anonymous) use ($request, $type, $catch, $challenge) {
+            try {
+                $header = HeaderFactory::createFromString(
+                    'Authorization',
+                    $request->headers->get('authorization')
+                );
+            } catch (NotHawkAuthorizationException $e) {
+                if ($anonymous) {
+                    // This is not a Hawk request but the firewall allows
+                    // anonymous requests so we should wrap the application
+                    // so that we might be able to challenge if authorization
+                    // fails.
+                    return (new WwwAuthenticateStackChallenge($app, $challenge))
+                        ->handle($request, $type, $catch);
+                }
 
-        // Use a helper function to work with Stack conventions for firewall
-        // configuration and authorization delegation.
-        list ($isResponse, $value, $firewall) = \Stack\Security\authenticate(
-            $this->app,
-            $challenge,
-            $firewalls,
-            $request,
-            $type,
-            $catch
-        );
-
-        if ($isResponse) {
-            // If our value represents a response we should immediately
-            // pass it back.
-            return $value;
-        }
-
-        // Otherwise, the value represents a delegate.
-        $delegate = $value;
-
-
-        //
-        // At this point we know for certain that Hawk authentication is
-        // expected to be possible for this request *and* that this request
-        // has an authorization header.
-        //
-
-        try {
-            $header = HeaderFactory::createFromString('Authorization', $request->headers->get('authorization'));
-        } catch (NotHawkAuthorizationException $e) {
-            return \Stack\Security\delegate_missing_authentication($firewall, $delegate, $challenge);
-        } catch (FieldValueParserException $e) {
-            // Something horribly wrong has happened.
-            return (new Response)->setStatusCode(400);
-        }
-
-        try {
-            $payload = $this->container['validate_payload_request']
-                ? ($request->getMethod() !== 'GET' ? $request->getContent() : null)
-                : null;
-
-            $authenticationResponse = $this->container['server']->authenticate(
-                $request->getMethod(),
-                $request->getHost(),
-                $request->getPort(),
-                $request->getRequestUri(),
-                $request->headers->get('content-type'),
-                $payload,
-                $header
-            );
-        } catch (UnauthorizedException $e) {
-            $response = (new Response)->setStatusCode(401);
-            $header = $e->getHeader();
-            $response->headers->set($header->fieldName(), $header->fieldValue());
-
-            return $response;
-        }
-
-        // Compatiblity with standard Stack authorization
-        $request->attributes->set(
-            'stack.authn.token',
-            $this->container['token_translator']($authenticationResponse->credentials())
-        );
-
-        // Hawk specific information
-        $request->attributes->set('hawk.credentials', $authenticationResponse->credentials());
-        $request->attributes->set('hawk.artifacts', $authenticationResponse->artifacts());
-
-        $response = call_user_func($delegate);
-
-        if ($this->container['sign_response']) {
-            $options = [];
-            if ($this->container['validate_payload_response']) {
-                $options['payload'] = $response->getContent();
-                $options['content_type'] = $response->headers->get('content-type');
+                // Anonymous requests are not allowed so we should challenge
+                // immediately.
+                return call_user_func($challenge, (new Response)->setStatusCode(401));
+            } catch (FieldValueParserException $e) {
+                // Something horribly wrong has happened.
+                return (new Response)->setStatusCode(400);
             }
 
-            $header = $this->container['server']->createHeader(
-                $authenticationResponse->credentials(),
-                $authenticationResponse->artifacts(),
-                $options
+            try {
+                $payload = $this->container['validate_payload_request']
+                    ? ($request->getMethod() !== 'GET' ? $request->getContent() : null)
+                    : null;
+
+                $authenticationResponse = $this->container['server']->authenticate(
+                    $request->getMethod(),
+                    $request->getHost(),
+                    $request->getPort(),
+                    $request->getRequestUri(),
+                    $request->headers->get('content-type'),
+                    $payload,
+                    $header
+                );
+            } catch (UnauthorizedException $e) {
+                $response = (new Response)->setStatusCode(401);
+                $header = $e->getHeader();
+                $response->headers->set($header->fieldName(), $header->fieldValue());
+
+                return $response;
+            }
+
+            // Stack authentication compatibility.
+            $request->attributes->set(
+                'stack.authn.token',
+                $this->container['token_translator']($authenticationResponse->credentials())
             );
 
-            $response->headers->set($header->fieldName(), $header->fieldValue());
-        }
+            // Hawk specific information
+            $request->attributes->set('hawk.credentials', $authenticationResponse->credentials());
+            $request->attributes->set('hawk.artifacts', $authenticationResponse->artifacts());
 
-        return $response;
+            $response = $app->handle($request, $type, $catch);
+
+            if ($this->container['sign_response']) {
+                $options = [];
+                if ($this->container['validate_payload_response']) {
+                    $options['payload'] = $response->getContent();
+                    $options['content_type'] = $response->headers->get('content-type');
+                }
+
+                $header = $this->container['server']->createHeader(
+                    $authenticationResponse->credentials(),
+                    $authenticationResponse->artifacts(),
+                    $options
+                );
+
+                $response->headers->set($header->fieldName(), $header->fieldValue());
+            }
+
+            return $response;
+        };
+
+        return (new FirewallAuthentication($this->app, [
+                'challenge' => $challenge,
+                'authenticate' => $authenticate,
+                'firewall' => $this->container['firewall'],
+            ]))
+            ->handle($request, $type, $catch);
     }
 
     private function setupContainer(array $options = array())
@@ -148,6 +145,7 @@ class Hawk implements HttpKernelInterface
             'sign_response' => true,
             'validate_payload_response' => true,
             'validate_payload_request' => true,
+            'firewall' => [],
         ]);
 
         $c['crypto'] = $c->share(function () {
@@ -186,5 +184,162 @@ class Hawk implements HttpKernelInterface
         }
 
         return $c;
+    }
+}
+
+class FirewallAuthentication implements HttpKernelInterface
+{
+    private $app;
+    private $firewall;
+    private $options;
+
+    public function __construct(HttpKernelInterface $app, array $options = [])
+    {
+        $this->app = $app;
+        $this->firewall = $options['firewall'];
+        unset($options['firewall']);
+        $this->options = $options;
+    }
+
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+    {
+        $firewall = static::matchFirewall($request, $this->firewall);
+
+        if (null === $firewall) {
+            // If no firewall is matched we can delegate immediately.
+            return $this->app->handle($request, $type, $catch);
+        }
+
+        return (new Authentication($this->app, array_merge($this->options, ['anonymous' => $firewall['anonymous']])))
+            ->handle($request, $type, $catch);
+    }
+
+    /**
+     * Left public currently so we can test this by itself; eventually would
+     * maybe like to make this a service that can be swapped out via
+     * configuration? Not sure what to do with it, really.
+     */
+    public static function matchFirewall(Request $request, array $firewalls)
+    {
+        if (!$firewalls) {
+            // By default we should firewall the root request and not allow
+            // anonymous requests. (will force challenge immediately)
+            $firewalls = [
+                ['path' => '/']
+            ];
+        }
+
+        $sortedFirewalls = [];
+        foreach ($firewalls as $firewall) {
+            if (!isset($firewall['anonymous'])) {
+                $firewall['anonymous'] = false;
+            }
+
+            if (isset($sortedFirewalls[$firewall['path']])) {
+                throw new \InvalidArgumentException("Path '".$firewall['path']."' specified more than one time.");
+            }
+
+            $sortedFirewalls[$firewall['path']] = $firewall;
+        }
+
+        // We want to sort things by more specific paths first. This will
+        // ensure that for instance '/' is never captured before any other
+        // firewalled paths.
+        krsort($sortedFirewalls);
+
+        foreach ($sortedFirewalls as $path => $firewall) {
+            if (0 === strpos($request->getPathInfo(), $path)) {
+                return $firewall;
+            }
+        }
+
+        return null;
+    }
+}
+
+class Authentication implements HttpKernelInterface
+{
+    private $app;
+    private $challenge;
+    private $authenticate;
+    private $anonymous;
+
+    public function __construct(HttpKernelInterface $app, array $options = [])
+    {
+        $this->app = $app;
+
+        if (!isset($options['challenge'])) {
+            $options['challenge'] = function (Response $response) {
+                // noop
+            };
+        }
+
+        if (!isset($options['authenticate'])) {
+            throw new \InvalidArgumentException("The 'authenticate' configuration is required");
+        }
+
+        $this->challenge = $options['challenge'];
+        $this->authenticate = $options['authenticate'];
+        $this->anonymous = $options['anonymous'];
+    }
+
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+    {
+        if ($request->attributes->has('stack.authn.token')) {
+            // If the request already has a Stack authentication token we
+            // should wrap the application so that it has the option to
+            // challenge if we get a 401 WWW-Authenticate: Stack response.
+            //
+            // Delegate immediately.
+            return (new WwwAuthenticateStackChallenge($this->app, $this->challenge))
+                ->handle($request, $type, $catch);
+        }
+
+        if ($request->headers->has('authorization')) {
+            // If we have an authorization header we should try and authenticate
+            // the request.
+            return call_user_func($this->authenticate, $this->app, $this->anonymous);
+        }
+
+        if ($this->anonymous) {
+            // If anonymous requests are allowed we should wrap the application
+            // so that it has the option to challenge if we get a 401
+            // WWW-Authenticate: Stack response.
+            //
+            // Delegate immediately.
+            return (new WwwAuthenticateStackChallenge($this->app, $this->challenge))
+                ->handle($request, $type, $catch);
+        }
+
+        // Since we do not allow anonymous requests we should challenge
+        // immediately.
+        return call_user_func($this->challenge, (new Response)->setStatusCode(401));
+    }
+}
+
+class WwwAuthenticateStackChallenge implements HttpKernelInterface
+{
+    private $app;
+    private $challenge;
+
+    public function __construct(HttpKernelInterface $app, $challenge = null)
+    {
+        $this->app = $app;
+        $this->challenge = $challenge ?: function (Response $response) {
+            return (new Response('Authentication not possible', 403));
+        };
+    }
+
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+    {
+        $response = $this->app->handle($request, $type, $catch);
+
+        if ($response->getStatusCode()==401 && $response->headers->get('WWW-Authenticate') === 'Stack') {
+            // By convention, we look for 401 response that has a WWW-Authenticate with field value of
+            // Stack. In that case, we should pass the response to the delegatee's challenge callback.
+            $response = call_user_func($this->challenge, $response);
+        }
+
+        return $response;
     }
 }

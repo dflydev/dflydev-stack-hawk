@@ -19,9 +19,22 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class SilexApplicationTest extends TestCase
 {
     /** @test */
+    public function shouldIgnoreRequestsNotFirewalled()
+    {
+        $app = $this->hawkify($this->createTestApp(), ['firewall' => [
+            ['path' => '/foo'],
+        ]]);
+
+        $client = new Client($app);
+
+        $client->request('GET', '/');
+        $this->assertEquals('Root.', $client->getResponse()->getContent());
+    }
+
+    /** @test */
     public function shouldNotChallengeForUnprotectedResourceNoHeader()
     {
-        $app = $this->hawkify($this->createTestApp(), ['firewalls' => [
+        $app = $this->hawkify($this->createTestApp(), ['firewall' => [
             ['path' => '/', 'anonymous' => true],
         ]]);
 
@@ -34,7 +47,7 @@ class SilexApplicationTest extends TestCase
     /** @test */
     public function shouldChallengeForProtectedResourceNoHeader()
     {
-        $app = $this->hawkify($this->createTestApp(), ['firewalls' => [
+        $app = $this->hawkify($this->createTestApp(), ['firewall' => [
             ['path' => '/', 'anonymous' => true],
         ]]);
 
