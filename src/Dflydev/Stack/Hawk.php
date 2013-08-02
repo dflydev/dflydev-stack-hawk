@@ -2,6 +2,8 @@
 
 namespace Dflydev\Stack;
 
+use Dflydev\Hawk\Credentials\CredentialsInterface;
+use Dflydev\Hawk\Credentials\CredentialsProviderInterface;
 use Dflydev\Hawk\Crypto\Crypto;
 use Dflydev\Hawk\Header\HeaderFactory;
 use Dflydev\Hawk\Server\ServerBuilder;
@@ -130,12 +132,13 @@ class Hawk implements HttpKernelInterface
             throw new \RuntimeException("No 'credentials_provider' callback or service specified");
         }
 
-        if ($options['credentials_provider'] instanceof UserProviderInterface ||
+        if ($options['credentials_provider'] instanceof CredentialsProviderInterface ||
             is_callable($options['credentials_provider'])) {
             $credentialsProvider = $options['credentials_provider'];
         } else {
             throw new \InvalidArgumentException(
-                "The 'credentials_provider' must either be an instance of UserProviderInterface or it must be callable"
+                "The 'credentials_provider' must either be an instance of CredentialsProviderInterface " .
+                "or it must be callable"
             );
         }
 
@@ -163,7 +166,7 @@ class Hawk implements HttpKernelInterface
             return $builder->build();
         });
 
-        $c['token_translator'] = $c->protect(function ($credentials) {
+        $c['token_translator'] = $c->protect(function (CredentialsInterface $credentials) {
             return $credentials->id();
         });
 
