@@ -66,12 +66,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dflydev/dflydev-stack-authentication.git",
-                "reference": "cb0b589e1eff3b2197515d0b05d4ffa96247ae91"
+                "reference": "d50425d672755b35d3b94ff546bd2b5510425554"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dflydev/dflydev-stack-authentication/zipball/cb0b589e1eff3b2197515d0b05d4ffa96247ae91",
-                "reference": "cb0b589e1eff3b2197515d0b05d4ffa96247ae91",
+                "url": "https://api.github.com/repos/dflydev/dflydev-stack-authentication/zipball/d50425d672755b35d3b94ff546bd2b5510425554",
+                "reference": "d50425d672755b35d3b94ff546bd2b5510425554",
                 "shasum": ""
             },
             "require": {
@@ -119,7 +119,7 @@
                 "stack",
                 "stack-2"
             ],
-            "time": "2013-08-02 01:38:54"
+            "time": "2013-08-02 03:27:21"
         },
         {
             "name": "dflydev/stack-firewall",
@@ -127,12 +127,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dflydev/dflydev-stack-firewall.git",
-                "reference": "f1850d6f65f6f5b072742ff7b695a94a16a2447b"
+                "reference": "f9dcdc7a63fc2ac3e456f499e2c156d1b0dbbf9d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dflydev/dflydev-stack-firewall/zipball/f1850d6f65f6f5b072742ff7b695a94a16a2447b",
-                "reference": "f1850d6f65f6f5b072742ff7b695a94a16a2447b",
+                "url": "https://api.github.com/repos/dflydev/dflydev-stack-firewall/zipball/f9dcdc7a63fc2ac3e456f499e2c156d1b0dbbf9d",
+                "reference": "f9dcdc7a63fc2ac3e456f499e2c156d1b0dbbf9d",
                 "shasum": ""
             },
             "require": {
@@ -181,7 +181,7 @@
                 "stack",
                 "stack-2"
             ],
-            "time": "2013-08-02 01:59:22"
+            "time": "2013-08-02 02:37:55"
         },
         {
             "name": "ircmaxell/random-lib",
