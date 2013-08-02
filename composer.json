@@ -20,12 +20,6 @@
             "Dflydev\\Stack": "src"
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/dflydev/dflydev-hawk"
-        }
-    ],
     "require": {
         "php": ">=5.4.0",
         "dflydev/hawk": "1.0.*@dev",

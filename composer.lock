@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "49a805a23b336ead0942f560e506a28b",
+    "hash": "daa896c1e1b1c59f7333752d828d587b",
     "packages": [
         {
             "name": "dflydev/hawk",
@@ -11,12 +11,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dflydev/dflydev-hawk.git",
-                "reference": "a3395b8ae4c8b5ff49919b67dbdd080c4bee953c"
+                "reference": "7b23fd8312bed3bcc63365b97461b7ecc2a64266"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dflydev/dflydev-hawk/zipball/a3395b8ae4c8b5ff49919b67dbdd080c4bee953c",
-                "reference": "a3395b8ae4c8b5ff49919b67dbdd080c4bee953c",
+                "url": "https://api.github.com/repos/dflydev/dflydev-hawk/zipball/7b23fd8312bed3bcc63365b97461b7ecc2a64266",
+                "reference": "7b23fd8312bed3bcc63365b97461b7ecc2a64266",
                 "shasum": ""
             },
             "require": {
@@ -36,11 +36,29 @@
                     "Dflydev\\Hawk": "src"
                 }
             },
-            "support": {
-                "source": "https://github.com/dflydev/dflydev-hawk/tree/master",
-                "issues": "https://github.com/dflydev/dflydev-hawk/issues"
-            },
-            "time": "2013-07-30 18:03:12"
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dragonfly Development Inc.",
+                    "email": "info@dflydev.com",
+                    "homepage": "http://dflydev.com"
+                },
+                {
+                    "name": "Beau Simensen",
+                    "email": "beau@dflydev.com",
+                    "homepage": "http://beausimensen.com"
+                }
+            ],
+            "description": "Hawk",
+            "keywords": [
+                "Authentication",
+                "bewit",
+                "hawk"
+            ],
+            "time": "2013-08-02 02:14:11"
         },
         {
             "name": "dflydev/stack-authentication",
